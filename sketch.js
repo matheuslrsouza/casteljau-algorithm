@@ -1,18 +1,18 @@
 
-let plan
+let plane
 let dragging
 let draggingPoint
 
 function setup() {
     createCanvas(500, 500)
-    plan = new Plan(100, 100)
+    plane = new Plane(100, 100)
 }
 
 mousePressed = function() {
-    let x = map(mouseX, 0, width, -plan.xRange, plan.xRange)
-    let y = map(mouseY, height, 0, -plan.yRange, plan.yRange)
+    let x = map(mouseX, 0, width, -plane.xRange, plane.xRange)
+    let y = map(mouseY, height, 0, -plane.yRange, plane.yRange)
 
-    for (let p of plan.points) {
+    for (let p of plane.points) {
         if (dist(p.x, p.y, x, y) < 3) {
             dragging = true
             draggingPoint = p
@@ -20,7 +20,7 @@ mousePressed = function() {
         }
     }
     if (!dragging) {
-        plan.addPoint(x, y);
+        plane.addPoint(x, y);
     }
 }
 
@@ -32,8 +32,8 @@ mouseReleased = function () {
 function draw() {
     background(100)
     
-    plan.curve = []
-    let nPoints = plan.points.length
+    plane.curve = []
+    let nPoints = plane.points.length
     // polinomio degree
     let n = nPoints - 1
 
@@ -43,8 +43,8 @@ function draw() {
 
         for (let i = 0; i < nPoints; i++) {
 
-            let Ai_x = plan.points[i].x
-            let Ai_y = plan.points[i].y
+            let Ai_x = plane.points[i].x
+            let Ai_y = plane.points[i].y
                 
             let Coeff = ft(n) / (ft(i) * ft(n - i))
 
@@ -55,7 +55,7 @@ function draw() {
             Px += Coeff * Math.pow((1 - t), exp1) * Ai_x * Math.pow(t, expT);
             Py += Coeff * Math.pow((1 - t), exp1) * Ai_y * Math.pow(t, expT);
         }
-        plan.addCurvePoint(Px, Py)
+        plane.addCurvePoint(Px, Py)
     }
 
     let pMouse = mapFromCanvas(mouseX, mouseY)
@@ -65,7 +65,7 @@ function draw() {
         draggingPoint.setX(pMouse[0])
         draggingPoint.setY(pMouse[1])
     } else { // check for hover
-        for (let p of plan.points) {
+        for (let p of plane.points) {
             if (dist(p.x, p.y, pMouse[0], pMouse[1]) < 5) {
                 p.color = [255, 255, 255]
             } else {
@@ -74,13 +74,13 @@ function draw() {
         }
     }    
 
-    plan.draw()
+    plane.draw()
 }
 
 function mapFromCanvas(x, y) {
     return [
-        map(x, 0, width, -plan.xRange, plan.xRange), 
-        map(y, height, 0, -plan.yRange, plan.yRange)
+        map(x, 0, width, -plane.xRange, plane.xRange), 
+        map(y, height, 0, -plane.yRange, plane.yRange)
     ]
     
 }

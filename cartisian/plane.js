@@ -1,4 +1,4 @@
-class Plan {
+class Plane {
 
     /**
      * define the space where the drawing will be made
@@ -26,7 +26,7 @@ class Plan {
     }
 
     draw() {
-        this._drawPlan()
+        this._drawPlane()
         this._drawPoints()
         this._drawLines()
         this._drawCurve()
@@ -56,7 +56,7 @@ class Plan {
         }
     }
 
-    _drawPlan() {
+    _drawPlane() {
         push()
         textSize(20);
         fill(0, 255, 0, 150)
