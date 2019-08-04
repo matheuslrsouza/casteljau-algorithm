@@ -10,20 +10,26 @@ class Plan {
         this.yRange = yRange
         this.points = []
         this.lines = []
+        this.curve = []
     }
 
-    addPoint(x, y) {
-        this.points.push(new Point(x, y, this.xRange, this.yRange))
+    addPoint(x, y, color, radius) {
+        this.points.push(new Point(x, y, this.xRange, this.yRange, color, radius))
     }
     
     addLine(x1, y1, x2, y2) {
         this.lines.push([x1, y1, x2, y2])
+    }
+    
+    addCurvePoint(x, y) {
+        this.curve.push(new Point(x, y, this.xRange, this.yRange, [32, 214, 4], 1))
     }
 
     draw() {
         this._drawPlan()
         this._drawPoints()
         this._drawLines()
+        this._drawCurve()
     }
 
     _drawPoints() {
@@ -42,6 +48,12 @@ class Plan {
             line(p1[0], p1[1], p2[0], p2[1])
         }
         pop()
+    }
+
+    _drawCurve() {
+        for (let p of this.curve) {
+            p.draw()
+        }
     }
 
     _drawPlan() {
@@ -74,21 +86,32 @@ class Plan {
 
 class Point {
 
-    constructor(x, y, xRange, yRange) {
+    constructor(x, y, xRange, yRange, color, radius) {
+        this.xRange = xRange
+        this.yRange = yRange
+        this.setX(x)
+        this.setY(y)        
 
+        this.color = color || [0, 255, 0]
+        this.radius = radius || 10
+    }
+
+    setX(x) {
         // map the values to be added in canvas
-        this.xCanvas = map(x, -xRange, xRange, 0, width)
-        this.yCanvas = map(y, -yRange, yRange, height, 0)
-        
+        this.xCanvas = map(x, -this.xRange, this.xRange, 0, width)
         this.x = x
-        this.y = y
+    }
 
-        this.radius = 10
+    setY(y) {
+        // map the values to be added in canvas
+        this.yCanvas = map(y, -this.yRange, this.yRange, height, 0)
+        this.y = y        
     }
 
     draw() {
         push()
-        fill(0, 255, 0)
+        noStroke()
+        fill(this.color[0], this.color[1], this.color[2])
         circle(this.xCanvas, this.yCanvas, this.radius)
         pop()
     }

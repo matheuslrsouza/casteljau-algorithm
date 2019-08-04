@@ -1,39 +1,43 @@
 
 let plan
+let dragging
+let draggingPoint
 
 function setup() {
     createCanvas(500, 500)
     plan = new Plan(100, 100)
-    /*plan.addPoint(-3, -5);
-    plan.addPoint(-5, 3);
-    plan.addPoint(4, 8);
-
-    plan.addLine(-3, -5, -5, 3)*/
 }
 
 mousePressed = function() {
     let x = map(mouseX, 0, width, -plan.xRange, plan.xRange)
     let y = map(mouseY, height, 0, -plan.yRange, plan.yRange)
-    plan.addPoint(x, y);
-}
 
-mouseDragged = function() {
-    for (let p of this.points) {
-        
+    for (let p of plan.points) {
+        if (dist(p.x, p.y, x, y) < 3) {
+            dragging = true
+            draggingPoint = p
+            break
+        }
+    }
+    if (!dragging) {
+        plan.addPoint(x, y);
     }
 }
 
-keyPressed = function() {
+mouseReleased = function () {
+    dragging = false
+    draggingPoint = undefined
+}
 
-    if (keyCode != SHIFT) {
-        return
-    }
-
+function draw() {
+    background(100)
+    
+    plan.curve = []
     let nPoints = plan.points.length
     // polinomio degree
     let n = nPoints - 1
 
-    for (let t = 0; t <= 1; t += 0.01) {
+    for (let t = 0; t <= 1; t += 1/1000) {
         let Px = 0
         let Py = 0
 
@@ -41,11 +45,8 @@ keyPressed = function() {
 
             let Ai_x = plan.points[i].x
             let Ai_y = plan.points[i].y
-
-            console.log(Ai_x, Ai_y)
                 
             let Coeff = ft(n) / (ft(i) * ft(n - i))
-            //console.log('Coeff:', Coeff)
 
             let exp1 = n - i
 
@@ -54,15 +55,34 @@ keyPressed = function() {
             Px += Coeff * Math.pow((1 - t), exp1) * Ai_x * Math.pow(t, expT);
             Py += Coeff * Math.pow((1 - t), exp1) * Ai_y * Math.pow(t, expT);
         }
-
-        plan.addPoint(Px, Py)
+        plan.addCurvePoint(Px, Py)
     }
-    // Math.pow((1 - t), n) * Ax + 2 * (1 - t) * t * Bx + t*t*Cx;
+
+    let pMouse = mapFromCanvas(mouseX, mouseY)
+    
+    if (dragging) {
+        draggingPoint.color = [255, 0, 0]
+        draggingPoint.setX(pMouse[0])
+        draggingPoint.setY(pMouse[1])
+    } else { // check for hover
+        for (let p of plan.points) {
+            if (dist(p.x, p.y, pMouse[0], pMouse[1]) < 5) {
+                p.color = [255, 255, 255]
+            } else {
+                p.color = [0, 255, 0]
+            }
+        }
+    }    
+
+    plan.draw()
 }
 
-function draw() {
-    background(100)
-    plan.draw()    
+function mapFromCanvas(x, y) {
+    return [
+        map(x, 0, width, -plan.xRange, plan.xRange), 
+        map(y, height, 0, -plan.yRange, plan.yRange)
+    ]
+    
 }
 
 function ft(n) {
