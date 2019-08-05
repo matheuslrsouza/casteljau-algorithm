@@ -5,7 +5,34 @@ let draggingPoint
 
 function setup() {
     createCanvas(500, 500)
+    frameRate(20)
     plane = new Plane(100, 100)
+
+    let x1 = -50
+    let y1 = f(x1)
+
+    let x2 = 50
+    let y2 = f(x2)
+
+    //plane.addLine(x1, y1, x2, y2)
+
+    x1 = -10
+    y1 = fPer(x1)
+
+    x2 = 10
+    y2 = fPer(x2)
+    //plane.addLine(x1, y1, x2, y2)
+}
+
+function f(x) {
+    return 0
+}
+
+function fPer(x, y, m) {
+    let m2 = y/x
+    let b = y - m2 * x
+    console.log(m, m2, x, b)
+    return m2 * x + b
 }
 
 mousePressed = function() {
@@ -33,29 +60,78 @@ function draw() {
     background(100)
     
     plane.curve = []
+    plane.lines = []
     let nPoints = plane.points.length
-    // polinomio degree
+    // Degree of the polynomial
     let n = nPoints - 1
 
-    for (let t = 0; t <= 1; t += 1/1000) {
-        let Px = 0
-        let Py = 0
+    if (nPoints > 1) {
 
-        for (let i = 0; i < nPoints; i++) {
+        for (let t = 0; t <= 1; t += 1/300) {
+            let Px = 0
+            let Py = 0
 
-            let Ai_x = plane.points[i].x
-            let Ai_y = plane.points[i].y
-                
-            let Coeff = ft(n) / (ft(i) * ft(n - i))
+            for (let i = 0; i < nPoints; i++) {
 
-            let exp1 = n - i
+                let Ai_x = plane.points[i].x
+                let Ai_y = plane.points[i].y
+                    
+                let Coeff = ft(n) / (ft(i) * ft(n - i))
 
-            let expT = i
+                let exp1 = n - i
 
-            Px += Coeff * Math.pow((1 - t), exp1) * Ai_x * Math.pow(t, expT);
-            Py += Coeff * Math.pow((1 - t), exp1) * Ai_y * Math.pow(t, expT);
+                let expT = i
+
+                Px += Coeff * Math.pow((1 - t), exp1) * Ai_x * Math.pow(t, expT);
+                Py += Coeff * Math.pow((1 - t), exp1) * Ai_y * Math.pow(t, expT);
+            }
+            
+            plane.addCurvePoint(Px, Py)
+
         }
-        plane.addCurvePoint(Px, Py)
+        if (plane.curve.length > 200) {
+
+            let theta = Math.PI / 2
+
+            for (let i = 0; i < 100; i++) {
+
+                let p1 = new Point(plane.curve[150 + i].x, plane.curve[150 + i].y, plane.xRange, plane.yRange, [255,0,0])
+                let p2 = new Point(plane.curve[60 + i].x, plane.curve[60 + i].y, plane.xRange, plane.yRange, [255,0,0])
+    
+                let m = (p2.y - p1.y) / (p2.x - p1.x)
+    
+                let mPx = (p1.x + p2.x) / 2
+                let mPy = (p1.y + p2.y) / 2
+    
+                p1.draw()
+                p2.draw()
+    
+                let m2 = -1/m
+                let b2 = mPy - m2 * mPx
+    
+                let ya = mPy + sin(theta) * 10
+                let pTest = new Point(mPx, ya, plane.xRange, plane.yRange, [0,0,255])
+                pTest.draw()
+
+                theta += Math.PI / 2
+                while (theta > Math.PI * 2) {
+                    theta -= Math.PI * 2
+                }
+
+    
+                // let proportion = m2 >= 1 ? 1/m2 : 1
+                // let xSk1 = mPx - proportion * 20
+                // let xSk2 = mPx + proportion * 20
+                
+                // let ya = m2 * xSk1 + b2
+                // let yb = m2 * xSk2 + b2
+    
+                // console.log(m2, "dist: " + Math.sqrt(Math.pow(ya - yb, 2) + Math.pow(xSk1 - xSk2, 2)))
+    
+                // plane.addLine(xSk1, ya, xSk2, yb)
+            }
+            
+        }
     }
 
     let pMouse = mapFromCanvas(mouseX, mouseY)
