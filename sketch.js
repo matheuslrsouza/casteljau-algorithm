@@ -89,34 +89,46 @@ function draw() {
             plane.addCurvePoint(Px, Py)
 
         }
-        if (plane.curve.length > 200) {
+        if (plane.curve.length > 300) {
 
-            let theta = Math.PI / 2
-
-            for (let i = 0; i < 100; i++) {
-
-                let p1 = new Point(plane.curve[150 + i].x, plane.curve[150 + i].y, plane.xRange, plane.yRange, [255,0,0])
-                let p2 = new Point(plane.curve[60 + i].x, plane.curve[60 + i].y, plane.xRange, plane.yRange, [255,0,0])
+            let offset = 5
+            let step = Math.PI / (plane.curve.length / offset)
+            let paramTheta = Math.PI
+            
+            for (let i = 0; i < plane.curve.length - offset; i+=offset) {
+                let p1 = new Point(plane.curve[2 + i].x, plane.curve[2 + i].y, plane.xRange, plane.yRange, [255,0,0])
+                let p2 = new Point(plane.curve[0 + i].x, plane.curve[0 + i].y, plane.xRange, plane.yRange, [255,0,0])
     
                 let m = (p2.y - p1.y) / (p2.x - p1.x)
     
                 let mPx = (p1.x + p2.x) / 2
                 let mPy = (p1.y + p2.y) / 2
     
-                p1.draw()
-                p2.draw()
+                // p1.draw()
+                // p2.draw()
     
                 let m2 = -1/m
                 let b2 = mPy - m2 * mPx
-    
-                let ya = mPy + sin(theta) * 10
-                let pTest = new Point(mPx, ya, plane.xRange, plane.yRange, [0,0,255])
-                pTest.draw()
 
-                theta += Math.PI / 2
-                while (theta > Math.PI * 2) {
-                    theta -= Math.PI * 2
+                let curveProportion = Math.sin(paramTheta) * 8
+                if (paramTheta >= Math.PI/2) {
+                    curveProportion = ((Math.sin(paramTheta) + Math.sin(Math.PI/2)) / 2) * 8
                 }
+
+                let theta = Math.atan(m2)
+
+
+                let ya = mPy + sin(theta) * curveProportion
+                let xa = mPx + cos(theta) * curveProportion
+                // let pTest = new Point(xa, ya, plane.xRange, plane.yRange, [0,0,255])
+                // pTest.draw()
+
+                let yb = mPy + sin(theta + Math.PI) * curveProportion
+                let xb = mPx + cos(theta + Math.PI) * curveProportion
+                // let pTest2 = new Point(xb, yb, plane.xRange, plane.yRange, [0,0,255])
+                // pTest2.draw()
+
+                paramTheta -= step
 
     
                 // let proportion = m2 >= 1 ? 1/m2 : 1
@@ -128,7 +140,7 @@ function draw() {
     
                 // console.log(m2, "dist: " + Math.sqrt(Math.pow(ya - yb, 2) + Math.pow(xSk1 - xSk2, 2)))
     
-                // plane.addLine(xSk1, ya, xSk2, yb)
+                plane.addLine(xa, ya, xb, yb)
             }
             
         }
