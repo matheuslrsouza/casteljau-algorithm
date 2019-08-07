@@ -7,32 +7,6 @@ function setup() {
     createCanvas(500, 500)
     frameRate(20)
     plane = new Plane(100, 100)
-
-    let x1 = -50
-    let y1 = f(x1)
-
-    let x2 = 50
-    let y2 = f(x2)
-
-    //plane.addLine(x1, y1, x2, y2)
-
-    x1 = -10
-    y1 = fPer(x1)
-
-    x2 = 10
-    y2 = fPer(x2)
-    //plane.addLine(x1, y1, x2, y2)
-}
-
-function f(x) {
-    return 0
-}
-
-function fPer(x, y, m) {
-    let m2 = y/x
-    let b = y - m2 * x
-    console.log(m, m2, x, b)
-    return m2 * x + b
 }
 
 mousePressed = function() {
@@ -58,7 +32,7 @@ mouseReleased = function () {
 
 function draw() {
     background(100)
-    
+
     plane.curve = []
     plane.lines = []
     let nPoints = plane.points.length
@@ -89,11 +63,17 @@ function draw() {
             plane.addCurvePoint(Px, Py)
 
         }
+
+        let outPoints = []
+
         if (plane.curve.length > 300) {
 
             let offset = 5
             let step = Math.PI / (plane.curve.length / offset)
             let paramTheta = Math.PI
+
+            let pointsRight = []
+            let pointsLeft = []
             
             for (let i = 0; i < plane.curve.length - offset; i+=offset) {
                 let p1 = new Point(plane.curve[2 + i].x, plane.curve[2 + i].y, plane.xRange, plane.yRange, [255,0,0])
@@ -104,46 +84,42 @@ function draw() {
                 let mPx = (p1.x + p2.x) / 2
                 let mPy = (p1.y + p2.y) / 2
     
-                // p1.draw()
-                // p2.draw()
-    
                 let m2 = -1/m
                 let b2 = mPy - m2 * mPx
 
-                let curveProportion = Math.sin(paramTheta) * 8
-                if (paramTheta >= Math.PI/2) {
-                    curveProportion = ((Math.sin(paramTheta) + Math.sin(Math.PI/2)) / 2) * 8
+                let sizeOfSkeleton = Math.sin(paramTheta)
+                let curveProportion = sizeOfSkeleton * 8
+                if (paramTheta > Math.PI/2) {
+                    // PI/2 is the major value for sin, we get half of it to average with the 
+                    // calculated point (sizeOfSkeleton)
+                    // in order to make the lower half of the blade grass greater than another half
+                    let halfOfMax = Math.sin(Math.PI/2)
+                    let average = (sizeOfSkeleton + halfOfMax) / 2
+                    curveProportion = average * 8
                 }
 
                 let theta = Math.atan(m2)
 
-
                 let ya = mPy + sin(theta) * curveProportion
                 let xa = mPx + cos(theta) * curveProportion
-                // let pTest = new Point(xa, ya, plane.xRange, plane.yRange, [0,0,255])
-                // pTest.draw()
 
                 let yb = mPy + sin(theta + Math.PI) * curveProportion
                 let xb = mPx + cos(theta + Math.PI) * curveProportion
-                // let pTest2 = new Point(xb, yb, plane.xRange, plane.yRange, [0,0,255])
-                // pTest2.draw()
 
                 paramTheta -= step
 
-    
-                // let proportion = m2 >= 1 ? 1/m2 : 1
-                // let xSk1 = mPx - proportion * 20
-                // let xSk2 = mPx + proportion * 20
-                
-                // let ya = m2 * xSk1 + b2
-                // let yb = m2 * xSk2 + b2
-    
-                // console.log(m2, "dist: " + Math.sqrt(Math.pow(ya - yb, 2) + Math.pow(xSk1 - xSk2, 2)))
-    
-                plane.addLine(xa, ya, xb, yb)
+                // plane.addLine(xa, ya, xb, yb)
+
+                pointsRight.push([xa, ya])
+                pointsLeft.push([xb, yb])
             }
+
+            // use reverse to connect the points in the correct order
+            outPoints = pointsRight.concat(pointsLeft.reverse())
             
         }
+
+        drawOutline(outPoints)
     }
 
     let pMouse = mapFromCanvas(mouseX, mouseY)
@@ -163,6 +139,19 @@ function draw() {
     }    
 
     plane.draw()
+}
+
+function drawOutline(outPoints) {
+    push()
+    beginShape()
+    fill(0, 200, 0, 200)
+    noStroke()
+    for (let p of outPoints) {
+        let pCanvas = plane.mapToCanvas(p[0], p[1])
+        vertex(pCanvas[0], pCanvas[1])
+    }
+    endShape()
+    pop()
 }
 
 function mapFromCanvas(x, y) {

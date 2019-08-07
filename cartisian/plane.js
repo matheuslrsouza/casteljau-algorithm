@@ -22,7 +22,7 @@ class Plane {
     }
     
     addCurvePoint(x, y) {
-        this.curve.push(new Point(x, y, this.xRange, this.yRange, [32, 214, 4], 1))
+        this.curve.push(new Point(x, y, this.xRange, this.yRange, [15, 77, 10], 2.5))
     }
 
     draw() {
