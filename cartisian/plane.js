@@ -68,7 +68,7 @@ class Plane {
         text('-' + this.yRange, width/2 + 10, height-10);
         text(this.yRange, width/2, 30);
 
-        stroke(0, 0, 0, 100)
+        stroke(255, 255, 255, 100)
         line(0, height / 2, width, height / 2) //x axis
         line(width / 2, 0, width / 2, height) //y axis
         pop()

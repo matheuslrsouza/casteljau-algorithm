@@ -31,7 +31,7 @@ mouseReleased = function () {
 }
 
 function draw() {
-    background(100)
+    background(10)
 
     plane.curve = []
     plane.lines = []
@@ -119,7 +119,7 @@ function draw() {
             
         }
 
-        drawOutline(outPoints)
+        //drawOutline(outPoints)
     }
 
     let pMouse = mapFromCanvas(mouseX, mouseY)
